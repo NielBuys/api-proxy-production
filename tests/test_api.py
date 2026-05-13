@@ -18,7 +18,7 @@ from app.main import app
 @pytest.mark.asyncio
 async def test_root_endpoint():
     """
-    Test that the root (/) endpoint returns 200 OK and 
+    Test that the root (/) endpoint returns 200 OK and
     the correct instructional message.
     """
     async with AsyncClient(

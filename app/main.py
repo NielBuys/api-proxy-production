@@ -33,10 +33,10 @@ async def root():
 async def get_user_gists(username: str):
     """
     Fetches public gists for a specific GitHub user.
-    
+
     Args:
         username (str): The GitHub handle to query.
-        
+
     Returns:
         dict: A collection of URLs pointing to the user's gists.
     """
