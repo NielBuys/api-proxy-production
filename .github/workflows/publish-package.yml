@@ -1,3 +1,16 @@
+# GitHub Actions Workflow: Docker Build and Publish
+# ------------------------------------------------
+# This workflow automates the creation of a Docker container image and publishes 
+# it to the GitHub Container Registry (GHCR). 
+#
+# Key Features:
+# - Authentication: Uses the built-in GITHUB_TOKEN for secure registry access.
+# - Metadata: Automatically generates semantic tags (e.g., branch names, git SHAs).
+# - OCI Compliance: Includes standard labels for better container traceability.
+#
+# The resulting image can be pulled via: 
+# docker pull ghcr.io/equalexperts-assignments/<repo-name>:latest
+
 name: Build and Publish Image
 
 on:
@@ -15,6 +28,7 @@ env:
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
+    # Required permissions to read code and upload to GitHub Packages
     permissions:
       contents: read
       packages: write
@@ -35,6 +49,11 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          # This ensures that pushes to 'solution' get the 'latest' tag
+          tags: |
+            type=ref,event=branch
+            type=semver,pattern={{version}}
+            type=sha,format=short
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
