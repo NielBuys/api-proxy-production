@@ -1,0 +1,46 @@
+# GitHub Actions Workflow: Python Automated Testing
+# ------------------------------------------------
+# This workflow runs the Pytest suite on every Pull Request to ensure code quality.
+# It validates that the Gist Proxy logic is functioning correctly before any code 
+# is merged into the 'solution' branch.
+#
+# Strategy:
+# - Triggered on pushes to 'solution' and all PRs targeting task branches.
+# - Uses a clean Ubuntu runner to ensure environment consistency.
+# - Sets PYTHONPATH to ensure the 'app' module is discoverable by Pytest.
+
+name: Python Package - pytest
+
+on:
+  push:
+    branches: 
+      - solution
+  pull_request:
+    branches: 
+      - solution
+      - 'tasks/**'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
+
+    - name: Set up Python 3.12
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.12"
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+
+    - name: Test with pytest
+      env:
+        PYTHONPATH: .
+      run: |
+        # We run pytest at the root level to pick up all tests in the /tests folder
+        pytest

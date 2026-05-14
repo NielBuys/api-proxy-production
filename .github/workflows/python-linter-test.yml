@@ -1,0 +1,44 @@
+# GitHub Actions Workflow: Python Linting and Formatting
+# ----------------------------------------------------
+# This workflow ensures that all code contributions adhere to PEP 8 standards
+# and project-specific formatting rules using Ruff.
+#
+# Ruff is used as a high-performance linter and formatter to catch 
+# programmatic errors (e.g., unused imports) and stylistic inconsistencies
+# before they reach the review stage.
+
+name: Python Linting - Ruff
+
+on:
+  push:
+    branches: 
+      - solution
+  pull_request:
+    branches: 
+      - solution
+      - 'tasks/**'
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install Ruff
+        run: |
+          python -m pip install --upgrade pip
+          pip install ruff
+
+      - name: Run Ruff Check
+        # This catches logic errors, unused imports, and common bugs
+        run: ruff check .
+
+      - name: Run Ruff Format Check
+        # This ensures the code is formatted correctly (fails if not)
+        run: ruff format --check .

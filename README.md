@@ -1,3 +1,7 @@
+### Submission Notes
+
+To the Equal Experts Review Team: Thank you for the opportunity to participate in this exercise. For detailed setup, execution instructions, and design decisions, please refer to the SOLUTION.md file.
+
 ## :warning: Please read these instructions carefully and entirely first
 * Clone this repository to your local machine.
 * Use your IDE of choice to complete the assignment.
