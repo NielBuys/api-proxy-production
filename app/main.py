@@ -37,7 +37,7 @@ async def root():
     logger.info("Root endpoint accessed")
     return {
         "message": "Welcome to my Gist API proxy! This API fetches public gists for a given GitHub username.",
-        "instructions": "Please add a GitHub username to the URL, e.g., /nielbuys",
+        "instructions": "Please add a GitHub username to the URL, e.g., /octocat",
     }
 
 

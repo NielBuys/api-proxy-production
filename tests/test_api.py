@@ -40,7 +40,7 @@ async def test_get_gists_structure():
         transport=ASGITransport(app=app), base_url="http://test"
     ) as ac:
         # We use a real username here to ensure a valid 200 response
-        response = await ac.get("/nielbuys")
+        response = await ac.get("/octocat")
 
     assert response.status_code == 200
     data = response.json()
