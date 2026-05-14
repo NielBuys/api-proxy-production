@@ -22,6 +22,7 @@ Use this to build the image from source on your local machine.
 ### 1.3 Using Local Python
 1. **Install:** `pip install -r requirements.txt`
 2. **Run:** `python -m uvicorn app.main:app --port 8080`
+3. **Test:** Navigate to `http://localhost:8080/octocat`
 
 ## 2. Automated Testing
 Tests are written using `pytest` and `httpx`.
