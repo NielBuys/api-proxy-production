@@ -1,0 +1,12 @@
+# Core application
+fastapi
+httpx
+uvicorn      # ← Removed [standard] for now "uvicorn[standard]"
+
+# Testing
+pytest
+pytest-asyncio
+respx
+
+# Development / Linting (optional - only used in CI)
+ruff
