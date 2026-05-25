@@ -1,5 +1,5 @@
 
-# deploy your app to Kubernetes Deployment which will start the pods running your app.
+# deploy your app to Kubernetes Deployment / cluster which will start the pods running your app.
 # kubectl apply -f deployment.yaml
 
 apiVersion: apps/v1

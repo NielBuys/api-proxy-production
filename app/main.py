@@ -41,6 +41,17 @@ async def root():
         "instructions": "Please add a GitHub username to the URL, e.g., /octocat",
     }
 
+@app.get("/health")
+async def health_check():
+    """Simple health check endpoint."""
+    logger.info("Health check endpoint accessed")
+    return {"status": "healthy"}
+
+@app.get("/ready")
+async def ready_check():
+    """Simple ready check endpoint."""
+    logger.info("Ready check endpoint accessed")
+    return {"status": "ready"}
 
 @app.get("/{username}")
 async def get_user_gists(username: str):
@@ -90,3 +101,4 @@ async def get_user_gists(username: str):
         except Exception as e:
             logger.critical(f"Unexpected system error: {str(e)}")
             raise HTTPException(status_code=500, detail="Internal Server Error")
+        
