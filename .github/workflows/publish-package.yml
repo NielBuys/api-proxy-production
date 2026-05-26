@@ -26,7 +26,7 @@ env:
 
 jobs:
   build-and-push:
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, windows]
     # Required permissions to read code and upload to GitHub Packages
     permissions:
       contents: read
