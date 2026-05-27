@@ -31,7 +31,7 @@ async def test_get_gists_success():
     # Mock the GitHub API call
     mock_gists = [
         {"html_url": "https://gist.github.com/octocat/12345"},
-        {"html_url": "https://gist.github.com/octocat/67890"}
+        {"html_url": "https://gist.github.com/octocat/67890"},
     ]
 
     respx.get("https://api.github.com/users/octocat/gists").mock(

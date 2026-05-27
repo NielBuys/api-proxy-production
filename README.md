@@ -1,47 +1,113 @@
-### Submission Notes
+# GitHub Gist Proxy API
 
-To the Equal Experts Review Team: Thank you for the opportunity to participate in this exercise. For detailed setup, execution instructions, and design decisions, please refer to the SOLUTION.md file.
+This repository contains a lightweight, containerized FastAPI web server that acts as a proxy for the GitHub Gist API. 
 
-## :warning: Please read these instructions carefully and entirely first
-* Clone this repository to your local machine.
-* Use your IDE of choice to complete the assignment.
-* When you have completed the assignment, you need to  push your code to this repository and [mark the assignment as completed by clicking here](https://app.snapcode.review/submission_links/3269ae3e-6103-4b40-86a3-7b0d9a13b7d9).
-* Once you mark it as completed, your access to this repository will be revoked. Please make sure that you have completed the assignment and pushed all code from your local machine to this repository before you click the link.
+I put this project together during a personal coding session to build a clean, production-ready implementation of an API proxy. It fetches a specified user's public Gists, includes automated testing, incorporates a CI/CD pipeline, and supports both Docker and Kubernetes deployments.
 
-## Operability Take-Home Exercise
+---
 
-Welcome to the start of our recruitment process for Operability Engineers. It was great to speak to you regarding an opportunity to join the Equal Experts network!
+## 🚀 Getting Started & How to Run
 
-Please write code to deliver a solution to the problems outlined below.
+The application listens for requests on port `8080`. You can test the endpoint by requesting public data for any GitHub user (e.g., `octocat`) at `http://localhost:8080/octocat`.
 
-We appreciate that your time is valuable and do not expect this exercise to **take more than 90 minutes**. If you think this exercise will take longer than that, I **strongly** encourage you to please get in touch to ask any clarifying questions.
+Choose one of the four methods below to get the application up and running:
 
-### Submission guidelines
-**Do**
-- Provide a README file in text or markdown format that documents a concise way to set up and run the provided solution.
-- Take the time to read any applicable API or service docs, it may save you significant effort.
-- Make your solution simple and clear. We aren't looking for overly complex ways to solve the problem since in our experience, simple and clear solutions to problems are generally the most maintainable and extensible solutions.
+### 1. Running via Pre-built Container (Recommended)
+You can pull and run the pre-built image directly from the GitHub Container Registry without needing the source code:
 
-**Don't**
+```bash
+# Pull the specific image version
+docker pull ghcr.io/nielbuys/assignment:sha-8794645
 
-Expect the reviewer to dedicate a machine to review the test by:
+# Run the container mapping host port 8080 to container port 8080
+docker run -p 8080:8080 ghcr.io/nielbuys/assignment:sha-8794645
+```
 
-- Installing software globally that may conflict with system software
-- Requiring changes to system-wide configurations
-- Providing overly complex solutions that need to spin up a ton of unneeded supporting dependencies. We aspire to keep our dev experiences as simple as possible (but no simpler)!
-- Include identifying information in your submission. We are endeavouring to make our review process anonymous to reduce bias.
+### 2. Running via Local Docker Build
+If you want to build the Docker image locally from the source code repository:
 
-### Exercise
-If you have any questions on the below exercise, please do get in touch and we’ll answer as soon as possible.
+```bash
+# Build the Docker image from the local Dockerfile
+docker build -t gist-proxy .
 
-#### Build an API, test it, and package it into a container
-- Build a simple HTTP web server API in any general-purpose programming language[^1] that interacts with the GitHub API and responds to requests on `/<USER>` with a list of the user’s publicly available Gists[^2].
-- Create an automated test to validate that your web server API works. An example user to use as test data is `octocat`.
-- Package the web server API into a docker container that listens for requests on port `8080`. You do not need to publish the resulting container image in any container registry, but we are expecting the Dockerfile in the submission.
-- The solution may optionally provide other functionality (e.g. pagination, caching) but the above **must** be implemented.
+# Run the newly built container
+docker run -p 8080:8080 gist-proxy
+```
 
-Best of luck,  
-Equal Experts
-__________________________________________
-[^1]: For example Go, Python or Ruby but not Bash or Powershell.  
-[^2]: https://docs.github.com/en/rest/gists/gists?apiVersion=2022-11-28
+### 3. Running Locally with Python
+To run the application directly on your host machine without using any containerization tools:
+
+```bash
+# (Optional) Create and activate a virtual environment
+python -m venv venv
+source venv/bin/activate  # On Windows use: venv\Scripts\activate
+
+# Install dependencies
+pip install -r requirements.txt
+
+# Run the Uvicorn ASGI server
+python -m uvicorn app.main:app --port 8080
+```
+
+### 4. Deploying to Kubernetes
+Ensure your local Kubernetes cluster is running (e.g., via Docker Desktop or Minikube) before applying the manifests:
+
+```bash
+# Verify your local cluster status
+kubectl config current-context
+kubectl get nodes
+
+# Deploy the application pod/deployment setup
+kubectl apply -f deployment.yaml
+
+# Open a temporary network tunnel to access the application at http://localhost:8080
+kubectl port-forward deployment/gist-api-deployment 8080:8080
+
+# (Optional) Apply the service manifest for permanent internal network routing
+kubectl apply -f service.yaml
+```
+
+## Testing & Code Quality
+
+### Running the Test Suite
+Tests are written using pytest and httpx. You can run them locally in two ways:
+
+### Using local Python environment:
+
+```bash
+pip install -r requirements.txt
+pytest
+```
+
+### Using Docker (Ephemeral Test Environment):
+If you want to ensure your tests run in an isolated environment without local dependencies:
+
+```bash
+docker build --target test -t gist-proxy-tests .
+```
+
+### Code Formatting & Linting
+This project leverages Ruff for fast Python linting and code formatting:
+
+```bash
+# Check code for style errors and apply safe auto-fixes
+ruff check --fix
+
+# Format code layout and sort imports
+ruff format
+```
+
+## Design Decisions & Operability
+
+- Asynchronous I/O: Built using FastAPI and httpx to ensure non-blocking network calls when fetching data from GitHub's upstream API.
+- Security & Hardening: The Dockerfile is optimized to run as a non-root appuser rather than default root, adhering to security best practices.
+- Code Quality: Integrated Ruff for modern, high-performance linting and PEP 8 compliance.
+- Observability: * Configured standardized logging to stdout for seamless container log aggregation.
+Added placeholder/example configurations for New Relic APM tracking inside the Dockerfile (currently commented out).
+
+## GitHub Actions Workflow
+The repository includes automation workflows to simulate a real-world engineering pipeline:
+
+1. Linting: Validates code quality and formatting on every pull request.
+2. Testing: Automatically runs the test suite to ensure structural integrity before code shifts.
+3. Build & Publish: Builds the Docker container and pushes tagged versions (:latest and :sha-*) directly to the GitHub Container Registry (GHCR).
