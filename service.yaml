@@ -1,0 +1,16 @@
+# this will create a Kubernetes Service to expose your app to the outside world. 
+# It will create a LoadBalancer which will give you an external IP address to access your app.
+# kubectl apply -f service.yaml
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: gist-api-service
+spec:
+  type: LoadBalancer
+  selector:
+    app: gist-api
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080

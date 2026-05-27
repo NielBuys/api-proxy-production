@@ -41,6 +41,20 @@ async def root():
     }
 
 
+@app.get("/health")
+async def health_check():
+    """Simple health check endpoint."""
+    logger.info("Health check endpoint accessed")
+    return {"status": "healthy"}
+
+
+@app.get("/ready")
+async def ready_check():
+    """Simple ready check endpoint."""
+    logger.info("Ready check endpoint accessed")
+    return {"status": "ready"}
+
+
 @app.get("/{username}")
 async def get_user_gists(username: str):
     """
@@ -58,11 +72,7 @@ async def get_user_gists(username: str):
         try:
             response = await client.get(GITHUB_URL.format(username=username))
 
-            if response.status_code == 404:
-                logger.warning(f"User not found on GitHub: {username}")
-                raise HTTPException(status_code=404, detail="GitHub User not found")
-
-            # Check for other HTTP errors (403 rate limits, 500 server errors, etc.)
+            # Let raise_for_status() handle ALL error status codes (404, 403, 500, etc.)
             response.raise_for_status()
 
             data = response.json()
@@ -77,9 +87,15 @@ async def get_user_gists(username: str):
             logger.error(
                 f"GitHub API error for {username}: Status {e.response.status_code}"
             )
+
+            if e.response.status_code == 404:
+                raise HTTPException(status_code=404, detail="GitHub User not found")
+
+            # For all other errors (403, 429, 500, etc.)
             raise HTTPException(
                 status_code=e.response.status_code, detail="GitHub API Error"
             )
+
         except Exception as e:
             logger.critical(f"Unexpected system error: {str(e)}")
             raise HTTPException(status_code=500, detail="Internal Server Error")

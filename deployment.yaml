@@ -1,0 +1,27 @@
+
+# deploy your app to Kubernetes Deployment / cluster which will start the pods running your app.
+# kubectl apply -f deployment.yaml
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gist-api-deployment
+  labels:
+    app: gist-api
+spec:
+  replicas: 2 # how many pods to run
+  selector:
+    matchLabels:
+      app: gist-api
+  template:
+    metadata:
+      labels:
+        app: gist-api
+    spec:
+      containers:
+      - name: gist-api-container
+        image: gist-api   
+# name of the image to run, this should match the name of the image you built with Docker, This can be container registry link if you push your image to a registry like Docker Hub
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 8080

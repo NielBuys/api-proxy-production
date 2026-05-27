@@ -1,49 +1,67 @@
 """
-Unit and Integration Tests
---------------------------
-This suite validates the FastAPI endpoints using httpx and pytest-asyncio.
-It uses ASGITransport to mock the server environment, allowing for fast,
-in-memory testing of the application logic.
-
-Tests:
-    - test_root_endpoint: Verifies the landing page content and status.
-    - test_get_gists_structure: Ensures the API response follows the expected schema.
+Unit Tests for Gist Proxy API
+-----------------------------
+Uses mocking to avoid calling the real GitHub API.
 """
 
 import pytest
-from httpx import AsyncClient, ASGITransport
+from httpx import AsyncClient, ASGITransport, Response
+import respx
 from app.main import app
 
 
 @pytest.mark.asyncio
 async def test_root_endpoint():
-    """
-    Test that the root (/) endpoint returns 200 OK and
-    the correct instructional message.
-    """
+    """Test the root endpoint - no external dependencies."""
     async with AsyncClient(
         transport=ASGITransport(app=app), base_url="http://test"
     ) as ac:
         response = await ac.get("/")
 
     assert response.status_code == 200
-    assert "Please add a GitHub username" in response.json()["instructions"]
+    data = response.json()
+    assert "Welcome to my Gist API proxy" in data["message"]
+    assert "Please add a GitHub username" in data["instructions"]
 
 
+@respx.mock
 @pytest.mark.asyncio
-async def test_get_gists_structure():
-    """
-    Test that the /{username} endpoint returns the correct JSON keys
-    and that the 'gists' field is a list.
-    """
+async def test_get_gists_success():
+    """Test successful case with mocked GitHub response."""
+    # Mock the GitHub API call
+    mock_gists = [
+        {"html_url": "https://gist.github.com/octocat/12345"},
+        {"html_url": "https://gist.github.com/octocat/67890"},
+    ]
+
+    respx.get("https://api.github.com/users/octocat/gists").mock(
+        return_value=Response(200, json=mock_gists)
+    )
+
     async with AsyncClient(
         transport=ASGITransport(app=app), base_url="http://test"
     ) as ac:
-        # We use a real username here to ensure a valid 200 response
         response = await ac.get("/octocat")
 
     assert response.status_code == 200
     data = response.json()
-    assert "username" in data
-    assert "gists" in data
-    assert isinstance(data["gists"], list)
+    assert data["username"] == "octocat"
+    assert len(data["gists"]) == 2
+    assert "https://gist.github.com/octocat/12345" in data["gists"]
+
+
+@respx.mock
+@pytest.mark.asyncio
+async def test_user_not_found():
+    """Test 404 handling from GitHub."""
+    respx.get("https://api.github.com/users/unknownuser/gists").mock(
+        return_value=Response(404, json={"message": "Not Found"})
+    )
+
+    async with AsyncClient(
+        transport=ASGITransport(app=app), base_url="http://test"
+    ) as ac:
+        response = await ac.get("/unknownuser")
+
+    assert response.status_code == 404
+    assert response.json()["detail"] == "GitHub User not found"
