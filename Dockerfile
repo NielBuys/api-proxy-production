@@ -11,7 +11,7 @@
 # - Utilizes Docker layer caching by copying requirements first.
 # - Disables pip cache to keep image size small.
 
-FROM python:3.12-slim-bookworm
+FROM python:3.12-slim-bookworm AS base
 
 # Create a system user to avoid running the application as root
 RUN useradd -m appuser
@@ -24,6 +24,21 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy application source code
 COPY app/ ./app/
+
+# ==============================================================================
+# TEST STAGE: This is what --target test will execute
+# It needs be added to publish docker yaml file in order to be executed in CI/CD pipeline
+# ==============================================================================
+FROM base AS test
+# Install testing dependencies (pytest) and run the test suite automatically
+RUN pip install pytest httpx
+COPY tests/ ./tests/
+RUN python -m pytest
+
+# ==============================================================================
+# PRODUCTION STAGE: The final, clean app image
+# ==============================================================================
+FROM base AS production
 
 # Port 8080 is common for Cloud Run/Azure App Service
 EXPOSE 8080
