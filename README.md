@@ -17,10 +17,10 @@ You can pull and run the pre-built image directly from the GitHub Container Regi
 
 ```bash
 # Pull the specific image version
-docker pull ghcr.io/nielbuys/assignment:sha-8794645
+docker pull ghcr.io/nielbuys/assignment:latest
 
 # Run the container mapping host port 8080 to container port 8080
-docker run -p 8080:8080 ghcr.io/nielbuys/assignment:sha-8794645
+docker run -p 8080:8080 ghcr.io/nielbuys/assignment:latest
 ```
 
 ### 2. Running via Local Docker Build
