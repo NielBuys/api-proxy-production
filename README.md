@@ -17,10 +17,10 @@ You can pull and run the pre-built image directly from the GitHub Container Regi
 
 ```bash
 # Pull the specific image version
-docker pull ghcr.io/nielbuys/assignment:latest
+docker pull ghcr.io/nielbuys/api-proxy-production:latest
 
 # Run the container mapping host port 8080 to container port 8080
-docker run -p 8080:8080 ghcr.io/nielbuys/assignment:latest
+docker run -p 8080:8080 ghcr.io/nielbuys/api-proxy-production:latest
 ```
 
 ### 2. Running via Local Docker Build
@@ -111,5 +111,3 @@ The repository includes automation workflows to simulate a real-world engineerin
 1. Linting: Validates code quality and formatting on every pull request.
 2. Testing: Automatically runs the test suite to ensure structural integrity before code shifts.
 3. Build & Publish: Builds the Docker container and pushes tagged versions (:latest and :sha-*) directly to the GitHub Container Registry (GHCR).
-
-test
