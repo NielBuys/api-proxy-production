@@ -111,3 +111,5 @@ The repository includes automation workflows to simulate a real-world engineerin
 1. Linting: Validates code quality and formatting on every pull request.
 2. Testing: Automatically runs the test suite to ensure structural integrity before code shifts.
 3. Build & Publish: Builds the Docker container and pushes tagged versions (:latest and :sha-*) directly to the GitHub Container Registry (GHCR).
+
+test
